@@ -1,16 +1,22 @@
 const { Router } = require('express');
-const ProductManagerController = require('../controllers/productsControllers');
+const ProductsController = require('../controllers/productsController');
 
-const productManagerRouter = new Router();
-const productManagerController = new ProductManagerController();
+const productRouter = new Router();
+const productsController = new ProductsController();
 
-productManagerRouter.get('/', productManagerController.getProducts.bind(productManagerController));
-productManagerRouter.get('/:pid', productManagerController.getProductById.bind(productManagerController));
-productManagerRouter.post('/', productManagerController.addProduct.bind(productManagerController));
-productManagerRouter.put('/:pid', productManagerController.updateProduct.bind(productManagerController));
-productManagerRouter.delete('/:pid', productManagerController.deleteProduct.bind(productManagerController));
+productRouter.get('/', productsController.getAllProducts.bind(productsController));
+productRouter.get('/:pid', productsController.getProductById.bind(productsController));
+productRouter.post('/', productsController.addProduct.bind(productsController));
+productRouter.put('/:pid', productsController.updateProduct.bind(productsController));
+productRouter.delete('/:pid', productsController.deleteProduct.bind(productsController));
 
-module.exports = productManagerRouter;
+module.exports = productRouter;
+
+
+
+
+
+ 
 
 
 

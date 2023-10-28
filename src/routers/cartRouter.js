@@ -1,19 +1,18 @@
 const { Router } = require('express');
-const CartController = require('../controllers/cartsControlles');
+const CartsController = require('../controllers/cartsController');
 
 const cartRouter = new Router();
-const cartController = new CartController();
+const cartsController = new CartsController();
 
-cartRouter.get('/', cartController.getCarts.bind(cartController));
-cartRouter.get('/:cid', cartController.getCartById.bind(cartController));
-cartRouter.post('/', cartController.addCart.bind(cartController));
-cartRouter.post('/:cid/:pid', cartController.addProductToCart.bind(cartController));
-cartRouter.delete('/:cid/products/:pid', cartController.removeProductFromCart.bind(cartController));
-cartRouter.put('/:cid', cartController.updateCartProducts.bind(cartController));
-cartRouter.put('/:cid/products/:pid', cartController.updateProductQuantity.bind(cartController));
-cartRouter.delete('/:cid', cartController.clearCart.bind(cartController));
+cartRouter.get('/', cartsController.getCarts.bind(cartsController));
+cartRouter.get('/:cid', cartsController.getCartById.bind(cartsController));
+cartRouter.post('/:cid/:pid', cartsController.addProductToCart.bind(cartsController));
+cartRouter.delete('/:cid/products/:pid', cartsController.removeProductFromCart.bind(cartsController));
+cartRouter.put('/:cid/products/:pid', cartsController.updateProductQuantity.bind(cartsController));
+cartRouter.delete('/:cid', cartsController.clearCart.bind(cartsController));
 
 module.exports = cartRouter;
+
 
 
 

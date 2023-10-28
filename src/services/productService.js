@@ -1,6 +1,7 @@
 const ProductManagerMongo = require('../dao/ProductManagerMongo');
+const productSorage =require('../storage/productStorage')
 
-class ProductManagerService {
+class ProductService {
     constructor() {
         this.manager = new ProductManagerMongo();
     }
@@ -46,4 +47,4 @@ class ProductManagerService {
     }
 }
 
-module.exports = ProductManagerService;
+module.exports = ProductService;
