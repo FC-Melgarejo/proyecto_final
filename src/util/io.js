@@ -6,7 +6,8 @@ const moment = require('moment');
 
 const init = (httpServer) => {
   const io = new Server(httpServer)
-  /*   const productManager = new ProductManager('./src/products.json', io) */
+     const productManager = new ProductManagerMongo('./src/products.json', io) 
+  console.log('Socket.IO inicializado');
 
   const productManagerMongo = new ProductManagerMongo(io)
   const messageManagerMongo = new MessageManagerMongo(io)

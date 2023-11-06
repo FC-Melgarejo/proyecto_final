@@ -1,91 +1,90 @@
-const UserManager = require('../dao/UserManagerMongo');
-const userManager = new UserManager();
+const express = require('express');
+const { Router } = require('express');
+const passport = require('passport');
+const UserModel = require('../dao/models/userModel');
+const { generateToken } = require('../util/jwt');
 const { createHash, isValidPassword } = require('../util/passwordHash');
+const UsersService = require('../services/usersService');
+const usersService = new UsersService();
 
-const UsersService = require('../service/usersService')
+
+
 
 class UsersController {
-  constructor () {
-    this.service = new UsersService()
-  }
 
-  getAll (req, res) {
-    console.log(this)
-    const users = this.service.getAll()
 
-    console.log(users)
+  async register(req, res) {
 
-    return res.json(users)
-  }
- 
-  get (req, res) {
-    const { id } = req.params
+    try {
+      const { name, lastname, email, password } = req.body;
+      if (!name || !lastname || !email || !password) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+      }
 
-    const user = this.service.get(id)
+      const user = await UserModel.findOne({ email });
 
-    if (!user) {
-      return res.status(404).json({
-        error: 'User no encontrado'
-      })
+      if (user) {
+        return res.status(401).json({ error: 'El usuario ya existe' });
+      }
+
+      const hashedPassword = createHash(password);
+
+      const newUser = {
+        name,
+        lastname,
+        email,
+        password: hashedPassword,
+        username: email,
+        isAdmin: req.body.isAdmin || false,
+      };
+
+      await UserModel.create(newUser);
+
+      return res.redirect('/login');
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-
-    return res.json(user)
   }
 
-  create (req, res) {
-    const { body } = req
-    // const body = req.body
+  async failRegister(req, res) {
+    return res.json({ error: 'Error al registrarse' });
+  }
 
-    const newUser = this.service.create(body)
+  async failLogin(req, res) {
+    return res.json({ error: 'Error al iniciar sesión' });
+  }
 
-    
-    if (!newUser) {
-      return res.status(500).json({
-        error: 'No se pudo crear el usuario'
-      })
+  async login(req, res) {
+    passport.authenticate('login', { failureRedirect: '/faillogin' })(req, res);
+  }
+
+  async recoveryPassword(req, res) {
+    try {
+      let user = await UserModel.findOne({ email: req.body.email });
+
+      if (!user) {
+        return res.status(401).json({
+          error: 'El usuario no existe en el sistema'
+        });
+      }
+
+      const newPassword = createHash(req.body.password);
+      await UserModel.updateOne({ email: user.email }, { password: newPassword });
+
+      return res.redirect('/login');
+    } catch (error) {
+      console.error('Error al recuperar contraseña:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-
-    return res.status(201).json(newUser)
   }
+}
 
-  update (req, res) {
-    const { id } = req.params
-    const { body } = req
-
-    const updatedUser = this.service.update(id, body)
-
-    if (!updatedUser) {
-      return res.status(500).json({
-        error: 'No se pudo actualizar el usuario'
-      })
-    }
-
-    return res.json(updatedUser)
-  }
-
-  delete (req, res) {
-    const { id } = req.params
-
-    const deletedUser = this.service.delete(id)
-
-    if (!deletedUser) {
-      return res.status(500).json({
-        error: 'No se pudo borrar el usuario'
-      })
-    }
-    
-    return res.status(204).json({})
-  }
-  login ( req, res ) {
-    const {mail,password} = req.body
-
-    const userLoggedIn = this.service.login(mail,password)
-
-    return res.json(userLoggedIn)
+module.exports = new UsersController();
 
 
-  }
- }
- 
 
- module.exports = UsersController;
+
+
+
+

@@ -5,6 +5,9 @@ const MessageManager = require('../dao/MessageManagerMongo');
 
 class DAOFactory {
     static getManager(entity) {
+        console.log(`Solicitando manager para la entidad: ${entity}`);
+        console.log('Hola, este es un mensaje de prueba');
+
         switch(entity) {
             case 'user':
                 return new UserManager();
@@ -19,5 +22,6 @@ class DAOFactory {
         }
     }
 }
+
 
 module.exports = DAOFactory;

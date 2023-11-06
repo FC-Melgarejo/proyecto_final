@@ -1,6 +1,6 @@
 const e = require("express")
-const UsersService = require("../service/usersService")
-const { verifyToken } = require("../utils/jwt")
+const UsersService = require("../services/usersService")
+const { verifyToken } = require("../util/jwt")
 
 class UserMiddleware{
     constructor() {

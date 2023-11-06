@@ -1,77 +1,97 @@
-const viewsService = require('../services/viewsService');
-const path = require('path');
+const UserManager = require('../dao/UserManagerMongo');
+const ViewsService = require('../services/viewsService');
 
-const renderRegister = (req, res) => {
-    console.log('renderizando registro');
-    return res.render(path.join(__dirname, '..', 'views', 'register')); 
-}
-
- 
-
-
-const renderLogin = (req, res) => {
-    return res.render('login');
-}
-
-const renderRecoveryPassword = (req, res) => {
-    return res.render('recovery-password');
-}
-
-const renderProfile = (req, res) => {
-    const user = req.session.user;
-
-    if (!user) {
-        return res.redirect('/login');
+class ViewsController {
+    constructor(viewsService) {
+        this.viewsService = viewsService;
     }
 
-    return res.render('profile', { user });
-}
+    async renderLogin(req, res) {
+        try {
+            const { email, password } = req.body;
+            if (!email || !password) {
+                return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+            }
 
-const renderAllProducts = async (req, res) => {
-    try {
-        const products = await productManager.getProducts();
-        res.render('products/allProducts', { products, cartId: 'your_cart_id' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los productos', message: error.message });
+            const user = await UserManager.getUserByEmail(email);
+
+            if (user) {
+                return res.status(401).json({ error: 'El usuario ya existe' });
+            }
+
+            const view = this.viewsService.renderLogin();
+            res.render(view);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
+        }
     }
-}
 
-const renderRealTimeProducts = async (req, res) => {
-    try {
-        const products = await productManager.getProducts();
+    recoveryPassword(req, res) {
+        try {
+            const view = this.viewsService.recoveryPassword();
+            res.render(view);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
+        }
+    }
+
+    renderProfile(req, res) {
+        try {
+            const view = this.viewsService.renderProfile(req.session.user);
+            res.render(view.view, view.data);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
+        }
+    }
+
+    async renderAllProducts(req, res) {
+        try {
+            const view = await this.viewsService.renderAllProducts();
+            res.render(view.view, view.data);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
+        }
+    }
+
+    async renderRealTimeProducts(req, res) {
         const limit = req.query.limit;
-
-        if (products.length === 0) {
-            return res.render('realtime-products', { title: 'Productos en Tiempo Real', noProducts: true });
+        try {
+            const view = await this.viewsService.renderRealTimeProducts(limit);
+            if (view.redirect) {
+                return res.redirect(view.redirect);
+            }
+            res.render(view.view, view.data);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
         }
+    }
 
-        if (limit) {
-            const limitedProducts = products.slice(0, parseInt(limit));
-            return res.render('realtime-products', { title: 'Productos en Tiempo Real', products: limitedProducts });
+    renderChat(req, res) {
+        try {
+            const view = this.viewsService.renderChat();
+            res.render(view.view, view.data);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
         }
+    }
 
-        return res.render('realtime-products', { title: 'Productos en Tiempo Real', products });
-    } catch (error) {
-        return res.redirect('/error?message=Error al obtener los productos en tiempo real');
+    renderError(req, res) {
+        const errorMessage = req.query.message || 'Ha ocurrido un error';
+        try {
+            const view = this.viewsService.renderError(errorMessage);
+            res.render(view.view, view.data);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al renderizar la vista');
+        }
     }
 }
 
-const renderChat = (req, res) => {
-    return res.render('chat', { title: 'Chat', style: 'styles.css' });
-}
+module.exports = ViewsController;
 
-const renderError = (req, res) => {
-    const errorMessage = req.query.message || 'Ha ocurrido un error';
-    res.render('error', { title: 'Error', errorMessage: errorMessage });
-}
-
-module.exports = {
-    renderRegister,
-    renderLogin,
-    renderRecoveryPassword,
-    renderProfile,
-    renderAllProducts,
-    renderRealTimeProducts,
-    renderChat,
-    renderError
-}

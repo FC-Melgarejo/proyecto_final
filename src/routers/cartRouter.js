@@ -1,5 +1,7 @@
 const { Router } = require('express');
 const CartsController = require('../controllers/cartsController');
+const UserMiddleware = require('../middleware/usersMiddleware');
+
 
 const cartRouter = new Router();
 const cartsController = new CartsController();
@@ -13,28 +15,33 @@ const usersMiddleware = new UserMiddleware();
 
 cartRouter.get('/',
 usersMiddleware.isAuth.bind(usersMiddleware),
-cartsController.getAll.bind(cartsController))
+cartsController.getCarts.bind(cartsController))
 
 cartRouter.get('/:id',
 usersMiddleware.isAuth.bind(usersMiddleware),
- cartsController.get.bind(cartsController))
+ cartsController.getCartById.bind(cartsController))
 
 
 cartRouter.post('/',
 usersMiddleware.isAuth.bind(usersMiddleware),
 usersMiddleware.hasRole('ADMIN'), 
-cartsController.create.bind(cartsController)),
+cartsController.createCart.bind(cartsController)),
 
 
 cartRouter.put('/:id',
 usersMiddleware.isAuth.bind(usersMiddleware),
 usersMiddleware.hasRole('MANAGER','USER'),
- cartsController.update.bind(cartsController))
+ cartsController.updateCart.bind(cartsController))
 
 cartRouter.delete('/:id',
 usersMiddleware.isAuth.bind(usersMiddleware),
 usersMiddleware.hasRole('ADMIN'),
- cartsController.delete.bind(cartsController)),
+ cartsController.removeProductFromCart.bind(cartsController)),
+
+ cartRouter.delete('/:id',
+usersMiddleware.isAuth.bind(usersMiddleware),
+usersMiddleware.hasRole('ADMIN'),
+ cartsController.clearCart.bind(cartsController)),
 
 module.exports = cartRouter;
 

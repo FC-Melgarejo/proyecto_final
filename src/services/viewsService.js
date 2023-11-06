@@ -1,3 +1,5 @@
+const UserManagerMongo = require('../dao/UserManagerMongo');
+
 class ViewsService {
     renderRegister() {
         return 'register';
@@ -21,7 +23,7 @@ class ViewsService {
 
     async renderAllProducts() {
         try {
-            const products = await productManager.getProducts();
+            const products = await UserManagerMongo.getProducts(); // Asegúrate de que esta función exista en tu UserManagerMongo
             return { view: 'products/allProducts', data: { products, cartId: 'your_cart_id' } };
         } catch (error) {
             return { error: 'Error al obtener los productos', message: error.message };
@@ -30,7 +32,7 @@ class ViewsService {
 
     async renderRealTimeProducts(limit) {
         try {
-            const products = await productManager.getProducts();
+            const products = await UserManagerMongo.getProducts(); // Asegúrate de que esta función exista en tu UserManagerMongo
 
             if (products.length === 0) {
                 return { view: 'realtime-products', data: { title: 'Productos en Tiempo Real', noProducts: true } };
@@ -57,3 +59,4 @@ class ViewsService {
 }
 
 module.exports = ViewsService;
+
