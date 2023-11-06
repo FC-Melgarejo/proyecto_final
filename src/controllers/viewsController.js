@@ -1,5 +1,6 @@
 const UserManager = require('../dao/UserManagerMongo');
 const ViewsService = require('../services/viewsService');
+const mongoose = requiere ('mongoose')
 
 class ViewsController {
     constructor(viewsService) {
