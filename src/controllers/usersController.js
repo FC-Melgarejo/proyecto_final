@@ -2,6 +2,7 @@ const express = require('express');
 const { Router } = require('express');
 const passport = require('passport');
 const UserModel = require('../dao/models/userModel');
+const mongoose = requiere ('mongoose');
 const { generateToken } = require('../util/jwt');
 const { createHash, isValidPassword } = require('../util/passwordHash');
 const UsersService = require('../services/usersService');
