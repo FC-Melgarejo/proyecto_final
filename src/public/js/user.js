@@ -1,3 +1,5 @@
+import { response } from "express";
+
 const socket = io();
 console.log(socket)
 
@@ -13,13 +15,13 @@ registrationForm.addEventListener('submit', async (event) => {
     });
 
     try {
-        const response = await fetch('/register', {
+        const response = await fetch('/localhost:8080/api/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+           
+        })
+        .then(response => response.json.parce())
+        .then(result => console.log(result))
+        .catch(error => console.log(error))
 
         const responseData = await response.json();
 

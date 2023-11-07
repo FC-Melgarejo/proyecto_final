@@ -9,6 +9,8 @@ const userRouter = new Router();
 
 
 userRouter.post('/register', UsersController.register.bind(UsersController));
+userRouter.post('/register', UsersController.register.bind(UsersController));
+
 
 userRouter.post('/login', UsersController.login.bind(UsersController));
 userRouter.get('/failregister', UsersController.failRegister.bind(UsersController));

@@ -2,7 +2,7 @@ const express = require('express');
 const { Router } = require('express');
 const passport = require('passport');
 const UserModel = require('../dao/models/userModel');
-const { generateToken } = require('../util/jwt');
+const  mongoose  = require('mongoose');
 const { createHash, isValidPassword } = require('../util/passwordHash');
 const UsersService = require('../services/usersService');
 const usersService = new UsersService();
@@ -57,6 +57,8 @@ class UsersController {
 
   async login(req, res) {
     passport.authenticate('login', { failureRedirect: '/faillogin' })(req, res);
+
+    return res.status(204).json({})
   }
 
   async recoveryPassword(req, res) {

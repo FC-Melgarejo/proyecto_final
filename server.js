@@ -5,105 +5,71 @@ const http = require('http');
 const initSocket = require('./src/util/io');
 const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const path = require('path');
-
 const session = require('express-session');
 const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const handlebars = require('express-handlebars');
 const MongoStore = require('connect-mongo');
-
+const mongoose = require('mongoose');
+const DB = require('./src/db/singleton'); // Importar Singleton
 const passport = require('passport');
 const initializePassport = require('./src/config/initializePasswordAuth');
-
 const productsRouter = require('./src/routers/productRouter');
 const cartRouter = require('./src/routers/cartRouter');
 const viewsRouter = require('./src/routers/viewsRouter');
 const sessionRouter = require('./src/routers/sessionRouter');
 const userRouter = require('./src/routers/userRouter');
+const config = require('./src/config/config');
+const cors = require('cors')
 
 const app = express();
+
+app.use(cors())
+
 const program = new Command();
+program
+  .option('--mode <mode>', 'Modo de trabajo', 'dev')
 
-program.option('--mode <mode>', 'Modo de trabajo', 'dev');
-program.parse();
+program.parse()
 
-const options = program.opts();
+const options = program.opts()
 
 dotenv.config({
   path: `.env.${options.mode}`
-});
+})
 
-const configFn = require('./src/config/config');
-const config = configFn();
+const settings = config()
+console.log({settings});
 
-const CONNECTION_STRING = `mongodb+srv://${config.db_user}:${config.db_password}@${config.db_host}/${config.db_name}?retryWrites=true&w=majority`;
+const dbConnection = DB.getConnection(settings)
 
-console.log(`Conectandose a ${CONNECTION_STRING}`);
+DB.getConnection(settings)
+
+
 
 // Configuración handlebars
 app.engine('handlebars', handlebars.engine());
 app.set('views', path.join(__dirname, 'src', 'views'));
 app.set('view engine', 'handlebars');
 
-// Middlewares
-app.use(cookieParser('secretCookie'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'src', 'public')));
-app.use(flash());
-
-// Session middleware
-app.use(session({
-  secret: 'secretSession',
-  store: MongoStore.create({
-    mongoUrl: CONNECTION_STRING,
-    ttl: 1800
-  }),
-  resave: true,
-  saveUninitialized: true
-}));
-
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Rutas
-app.use('/', viewsRouter);
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartRouter);
-app.use('/api/sessions', sessionRouter);
-app.use('/api/users', userRouter);
-
-// MongoDB conexión
-mongoose.connect(CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Conexión a MongoDB establecida');
-    // Iniciar servidor HTTP
-    const server = http.createServer(app);
-    initSocket(new Server(server));
-    server.listen(8080, () => {
-      console.log('Servidor corriendo en puerto 8080');
-    });
-  })
-  .catch(error => console.error('Error al conectar a MongoDB:', error));
 
 
+// Iniciar servidor HTTP
+const server = http.createServer(app);
+const io = initSocket(new Server(server));
 
+server.listen(8080, () => {
+  console.log('Servidor corriendo en puerto 8080');
+});
 
 app.get('/', (req, res) => {
-    res.json({
-        status: 'running'
-    });
+  res.json({
+    status: 'running'
+  });
 });
 
 
-
-const server = http.createServer(app); // Crear servidor HTTP
-
-const io = initSocket(server); // Inicializar Socket.IO
 
 
 

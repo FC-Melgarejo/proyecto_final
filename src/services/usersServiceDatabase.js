@@ -12,8 +12,10 @@ class UsersService {
     } catch (error) {
       throw error;
     }
-  }
+    
 
+    
+  }
   async get (id) {
     try {
       const user = await this.userManager.get(id);
