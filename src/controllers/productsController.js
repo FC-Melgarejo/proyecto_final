@@ -93,7 +93,7 @@ class ProductsController {
 module.exports = ProductsController;
 
 
-module.exports = ProductsController;
+
 
 
 

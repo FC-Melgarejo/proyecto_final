@@ -1,4 +1,5 @@
 const userModel = require('../dao/models/userModel');
+const mongoose= requiere ('mongoose')
 const { generateToken } = require('../util/jwt');
 const { createHash, isValidPassword } = require('../util/passwordHash');
 
