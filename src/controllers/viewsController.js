@@ -1,98 +1,25 @@
-const UserManager = require('../dao/UserManagerMongo');
-const ViewsService = require('../services/viewsService');
-const mongoose = requiere ('mongoose')
-
+// viewsController.js
 class ViewsController {
-    constructor(viewsService) {
-        this.viewsService = viewsService;
+    renderRegister(req, res) {
+        res.render('register.hbs');
     }
 
-    async renderLogin(req, res) {
-        try {
-            const { email, password } = req.body;
-            if (!email || !password) {
-                return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-            }
-
-            const user = await UserManager.getUserByEmail(email);
-
-            if (user) {
-                return res.status(401).json({ error: 'El usuario ya existe' });
-            }
-
-            const view = this.viewsService.renderLogin();
-            res.render(view);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
-    }
-
-    recoveryPassword(req, res) {
-        try {
-            const view = this.viewsService.recoveryPassword();
-            res.render(view);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
-    }
-
-    renderProfile(req, res) {
-        try {
-            const view = this.viewsService.renderProfile(req.session.user);
-            res.render(view.view, view.data);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
-    }
-
-    async renderAllProducts(req, res) {
-        try {
-            const view = await this.viewsService.renderAllProducts();
-            res.render(view.view, view.data);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
-    }
-
-    async renderRealTimeProducts(req, res) {
-        const limit = req.query.limit;
-        try {
-            const view = await this.viewsService.renderRealTimeProducts(limit);
-            if (view.redirect) {
-                return res.redirect(view.redirect);
-            }
-            res.render(view.view, view.data);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
+    renderLogin(req, res) {
+        res.render('login.hbs');
     }
 
     renderChat(req, res) {
-        try {
-            const view = this.viewsService.renderChat();
-            res.render(view.view, view.data);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
+        res.render('chat.hbs');
     }
 
     renderError(req, res) {
         const errorMessage = req.query.message || 'Ha ocurrido un error';
-        try {
-            const view = this.viewsService.renderError(errorMessage);
-            res.render(view.view, view.data);
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al renderizar la vista');
-        }
+        res.render('error.hbs', { errorMessage });
     }
+
+    // Otros métodos para renderizar diferentes vistas
 }
 
 module.exports = ViewsController;
+
 

@@ -28,9 +28,10 @@ const initializePassport = () => {
             });
 
             return done(null, newUser);
-        } catch (e) {
-            return done(e);
+        }  catch (e) {
+            done(e); // pasa el error al middleware de Passport
         }
+    
     }));
 
     // Estrategia de registro local

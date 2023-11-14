@@ -21,27 +21,27 @@ cartRouter.get('/:id',
 usersMiddleware.isAuth.bind(usersMiddleware),
  cartsController.getCartById.bind(cartsController))
 
-
 cartRouter.post('/',
-usersMiddleware.isAuth.bind(usersMiddleware),
-usersMiddleware.hasRole('ADMIN'), 
-cartsController.createCart.bind(cartsController)),
-
+  usersMiddleware.isAuth.bind(usersMiddleware),
+  cartsController.createCart.bind(cartsController)
+),
 
 cartRouter.put('/:id',
-usersMiddleware.isAuth.bind(usersMiddleware),
-usersMiddleware.hasRole('MANAGER','USER'),
- cartsController.updateCart.bind(cartsController))
+  usersMiddleware.isAuth.bind(usersMiddleware),
+  cartsController.updateCart.bind(cartsController)
+)
 
 cartRouter.delete('/:id',
-usersMiddleware.isAuth.bind(usersMiddleware),
-usersMiddleware.hasRole('ADMIN'),
- cartsController.removeProductFromCart.bind(cartsController)),
+  usersMiddleware.isAuth.bind(usersMiddleware),
+  usersMiddleware.hasRole('ADMIN'),
+  cartsController.removeProductFromCart.bind(cartsController)
+),
 
- cartRouter.delete('/:id',
-usersMiddleware.isAuth.bind(usersMiddleware),
-usersMiddleware.hasRole('ADMIN'),
- cartsController.clearCart.bind(cartsController)),
+cartRouter.delete('/:id',
+  usersMiddleware.isAuth.bind(usersMiddleware),
+  usersMiddleware.hasRole('ADMIN'),
+  cartsController.clearCart.bind(cartsController)
+),
 
 module.exports = cartRouter;
 

@@ -1,42 +1,40 @@
-const mongoose = require('mongoose');
-const UserModel = require('../dao/models/userModel');
+const userModel = require('./models/userModel');
 const bcrypt = require('bcrypt');
-const { createHash } = require('../util/passwordHash');
-
 
 class UserManager {
-    constructor(io) {
-        this.model = UserModel;
-        this.io = io;
+    constructor() {
+        this.model = userModel;
     }
 
-    async create(data) {
+    async createUser(data) {
         try {
-            const { name, lastname, email, password, isAdmin } = data;
-
-            if (!name || !lastname || !email || !password) {
+            if (
+                !data.name ||
+                !data.lastname ||
+                !data.email ||
+                !data.password
+            ) {
                 throw new Error('Todos los campos son obligatorios');
             }
 
-            const hashedPassword = await createHash(password);
-            const exist = await this.model.findOne({ email });
+            const hashedPassword = await createHash(data.password);
+ 
+            const exist = await this.model.findOne({ email: data.email });
 
             if (exist) {
-                throw new Error(`Ya existe un usuario con el email ${email}`);
+                throw new Error(`Ya existe un usuario con el email ${data.email}`);
             }
 
             await this.model.create({
-                name,
-                lastname,
-                email,
-                password: hashedPassword,
-                isAdmin: isAdmin || false,
+                name: data.name,
+                lastname: data.lastname,
+                email: data.email,
+                password: hashedPassword, // Guarda la contraseña cifrada en la base de datos
+                isAdmin: data.isAdmin || false,
             });
-
-            this.newUser();
-
         } catch (error) {
-            throw error;
+            console.error('Error al crear usuario:', error);
+            return { success: false, message: 'Error interno al crear usuario' };
         }
     }
 
@@ -53,16 +51,16 @@ class UserManager {
             if (!passwordMatch) {
                 throw new Error('Los datos ingresados no son correctos');
             }
-
             const authenticatedUser = { ...user.toObject(), password: undefined };
 
-            return authenticatedUser;
+            return { success: true, user: authenticatedUser };
         } catch (error) {
-            throw error;
+            console.error('Error al autenticar usuario:', error);
+            return { success: false, message: 'Error interno al autenticar usuario' };
         }
     }
-
-    async isAdmin(email) {
+     // Método para comprobar si un usuario es administrador
+     async isAdmin(email) {
         try {
             const user = await this.model.findOne({ email });
 
@@ -76,10 +74,11 @@ class UserManager {
         }
     }
 
-    newUser() {
-        this.io.emit('newuser');
+            
     }
-}
+
+   
+
 
 module.exports = UserManager;
 

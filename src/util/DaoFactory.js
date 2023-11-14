@@ -1,27 +1,30 @@
-const UserManager = require('../dao/UserManagerMongo');
-const ProductManager = require('../dao/ProductManagerMongo');
-const CartManager = require('../dao/CartsManagerMongo');
-const MessageManager = require('../dao/MessageManagerMongo');
+const CartManager = require('../dao/fs/CartManager');
+const ProductManager = require('../dao/fs/ProductManager');
+const UserManager = require('../dao/fs/userManager');
+const CartManagerMongo = require('../dao/CartsManagerMongo');
+const ProductManagerMongo = require('../dao/ProductManagerMongo');
+const UserManagerMongo = require('../dao/UserManagerMongo');
 
 class DAOFactory {
-    static getManager(entity) {
-        console.log(`Solicitando manager para la entidad: ${entity}`);
-        console.log('Hola, este es un mensaje de prueba');
-
-        switch(entity) {
-            case 'user':
-                return new UserManager();
-            case 'product':
-                return new ProductManager();
-            case 'cart':
-                return new CartManager();
-            case 'message':
-                return new MessageManager();
+    static getDAO(daoType) {
+        switch (daoType) {
+            case 'fs':
+                return {
+                    CartManager: new CartManager(),
+                    ProductManager: new ProductManager(),
+                    UserManager: new UserManager()
+                };
+            case 'mongo':
+                return {
+                    CartManager: new CartManagerMongo(),
+                    ProductManager: new ProductManagerMongo(),
+                    UserManager: new UserManagerMongo()
+                };
             default:
-                throw new Error('Entidad no válida');
+                throw new Error('Tipo de DAO no soportado');
         }
     }
 }
 
-
 module.exports = DAOFactory;
+

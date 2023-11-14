@@ -19,10 +19,11 @@ productRouter.post('/',
   usersMiddleware.hasRole('ADMIN'), 
   productsController.createProduct.bind(productsController));
 
-productRouter.put('/:id',
+  productRouter.put('/:id',
   usersMiddleware.isAuth.bind(usersMiddleware),
-  usersMiddleware.hasRole('MANAGER','USER'),
+  usersMiddleware.hasRole('ADMIN'),  
   productsController.updateProduct.bind(productsController));
+
 
 productRouter.delete('/:id',
   usersMiddleware.isAuth.bind(usersMiddleware),

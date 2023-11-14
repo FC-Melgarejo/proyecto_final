@@ -1,92 +1,24 @@
-const express = require('express');
-const { Router } = require('express');
-const passport = require('passport');
-const UserModel = require('../dao/models/userModel');
-const { generateToken } = require('../util/jwt');
-const { createHash, isValidPassword } = require('../util/passwordHash');
-const UsersService = require('../services/usersService');
-const usersService = new UsersService();
+const User = require("../dao/clases/user.dao");
+const userService = new User();
 
-
-
-
-class UsersController {
-
-
-  async register(req, res) {
-
-    try {
-      const { name, lastname, email, password } = req.body;
-      if (!name || !lastname || !email || !password) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-      }
-
-      const user = await UserModel.findOne({ email });
-
-      if (user) {
-        return res.status(401).json({ error: 'El usuario ya existe' });
-      }
-
-      const hashedPassword = createHash(password);
-
-      const newUser = {
-        name,
-        lastname,
-        email,
-        password: hashedPassword,
-        username: email,
-        isAdmin: req.body.isAdmin || false,
-      };
-
-      await UserModel.create(newUser);
-
-      return res.redirect('/login');
-    } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      return res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  }
-
-  async failRegister(req, res) {
-    return res.json({ error: 'Error al registrarse' });
-  }
-
-  async failLogin(req, res) {
-    return res.json({ error: 'Error al iniciar sesión' });
-  }
-
-  async login(req, res) {
-    passport.authenticate('login', { failureRedirect: '/faillogin' })(req, res);
-
-    return res.status(204).json({})
-  }
-
-  async recoveryPassword(req, res) {
-    try {
-      let user = await UserModel.findOne({ email: req.body.email });
-
-      if (!user) {
-        return res.status(401).json({
-          error: 'El usuario no existe en el sistema'
-        });
-      }
-
-      const newPassword = createHash(req.body.password);
-      await UserModel.updateOne({ email: user.email }, { password: newPassword });
-
-      return res.redirect('/login');
-    } catch (error) {
-      console.error('Error al recuperar contraseña:', error);
-      return res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  }
+const getUsers = async (req, res) => {
+    let result = await userService.getUsers();
+    res.send({ status: "success", result });
 }
 
-module.exports = new UsersController();
+const getUserById = async (req, res) => {
+    const { uid } = req.params;
+    let user = await userService.getUserById(uid);
+    res.send({ status: "success", result: user });
+}
 
+const saveUser = async (req, res) => {
+    const user = req.body; // las validaciones de campos van por tu cuenta
+    let result = await userService.saveUser(user);
+    res.send({ status: "success", result });
+}
 
-
-
+module.exports = { getUsers, getUserById, saveUser };
 
 
 

@@ -14,11 +14,10 @@ class ProductRepository {
             throw error;
         }
     }
-
-    async getProductById(productId) {
+    async getProductById(id) {
         try {
-            const product = await this.productManager.getProductById(productId);
-            return product;
+            const product = await this.model.findById(id);
+            return product ? product.toObject() : null;
         } catch (error) {
             throw error;
         }

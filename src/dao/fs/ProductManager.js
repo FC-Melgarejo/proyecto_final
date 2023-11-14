@@ -1,5 +1,5 @@
 const fs = require("fs");
-const generateId = require('../../utils/io');
+const generateId = require('../../util/generateId');
 
 class ProductManager {
     constructor(path, io) {

@@ -1,8 +1,5 @@
 import { response } from "express";
 
-const socket = io();
-console.log(socket)
-
 const registrationForm = document.getElementById('registrationForm');
 
 registrationForm.addEventListener('submit', async (event) => {
@@ -15,13 +12,10 @@ registrationForm.addEventListener('submit', async (event) => {
     });
 
     try {
-        const response = await fetch('/localhost:8080/api/register', {
+        const response = await fetch('/api/users/register', {
             method: 'POST',
-           
-        })
-        .then(response => response.json.parce())
-        .then(result => console.log(result))
-        .catch(error => console.log(error))
+            body: formData, // Usa formData aquí
+        });
 
         const responseData = await response.json();
 
@@ -39,29 +33,29 @@ registrationForm.addEventListener('submit', async (event) => {
 
 function addToCart(cid, pid) {
     const data = {
-      cid: cid,
-      pid: pid
+        cid: cid,
+        pid: pid
     };
-  
+
     fetch('/addtocart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Respuesta del servidor:', data);
-  
-      // Actualizar la interfaz de usuario según la respuesta del servidor
+        console.log('Respuesta del servidor:', data);
+
+        // Actualizar la interfaz de usuario según la respuesta del servidor
     })
     .catch(error => {
-      console.error('Error:', error);
+        console.error('Error:', error);
     });
-  }
-  
-  // Otras funciones relacionadas con el carrito de compras
-  
-  // Exportar las funciones que quieras utilizar en otros archivos
-  export { addToCart, /* otras funciones */ };
+}
+
+// Otras funciones relacionadas con el carrito de compras
+
+// Exportar las funciones que quieras utilizar en otros archivos
+export { addToCart, /* otras funciones */ };

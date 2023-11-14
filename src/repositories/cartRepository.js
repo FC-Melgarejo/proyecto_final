@@ -1,4 +1,5 @@
 const cartModel = require('../dao/models/cartModel');
+const productRepository = require('./productRepository'); 
 
 class CartRepository {
     constructor() {
@@ -34,33 +35,32 @@ class CartRepository {
             throw error;
         }
     }
-
+    
     async addProductToCart(cartId, productId) {
         try {
             const cart = await this.model.findById(cartId);
             if (!cart) {
                 throw new Error('No se encuentra el carrito');
             }
-
-            // Asegúrate de tener implementada la lógica para obtener un producto por su ID
-            const product = await productRepository.getProductById(productId);
-
+    
+            const product = await productRepository.getProductById(productId); // Obtener el producto por su ID
+    
             if (!product) {
                 throw new Error('Producto no encontrado en el inventario');
             }
-
+    
             const existingProductInCart = cart.products.findIndex(p => p.product.toString() === productId);
             const productToAdd = {
                 product: productId,
                 quantity: 1
             };
-
+    
             if (existingProductInCart !== -1) {
                 cart.products[existingProductInCart].quantity++;
             } else {
                 cart.products.push(productToAdd);
             }
-
+    
             cart.markModified('products');
             await cart.save();
         } catch (error) {
@@ -101,6 +101,7 @@ class CartRepository {
             throw error;
         }
     }
+    
 }
 
 module.exports = CartRepository;

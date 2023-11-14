@@ -1,3 +1,4 @@
+const ProducModel = require('../dao/models/productModel')
 const ProductRepository = require('../repositories/productRepository');
 const ProductManagerMongo = require('../dao/ProductManagerMongo');
 

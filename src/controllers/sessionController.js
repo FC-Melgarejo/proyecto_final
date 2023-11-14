@@ -1,23 +1,37 @@
 const userModel = require('../dao/models/userModel');
-const mongoose= requiere ('mongoose')
 const { generateToken } = require('../util/jwt');
-const { createHash, isValidPassword } = require('../util/passwordHash');
+const passport = require('passport');
 
 class SessionController {
     
-    async githubLogin(req, res) {
+    
+    
+    githubLogin(req, res) {
         passport.authenticate('github', {
-            scope: ['user:email']
+            scope: ['email']
         })(req, res);
     }
 
-    async githubCallback(req, res, next) {
+    githubCallback(req, res, next) {
         passport.authenticate('github', {
             failureRedirect: '/login'
         })(req, res, next);
     }
+
+    async login(req, res) {
+        passport.authenticate('login', { failureRedirect: '/faillogin' })(req, res);
+
+        const token = generateToken({ userId: req.user.id });
+        res.json({ token });
+
+        return res.status(204).json({});
+    }
+
+    logout(req, res) {
+        req.logout(); // Cierra la sesión del usuario
+        res.redirect('/'); // Redirige a la página de inicio
+    }
 }
+module.exports = SessionController;
 
-
-module.exports = new SessionController();
 
